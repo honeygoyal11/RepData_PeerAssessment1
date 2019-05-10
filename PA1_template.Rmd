@@ -1,8 +1,24 @@
 ---
-title: "Reproducible Research: Peer Assessment 1" 
-output:  
+title: "Reproducible Research Project 1" 
+
+author: "honey goyal" 
+
+date: "June 16, 2018" 
+
+output: 
+
 html_document: 
+
+fig_caption: yes 
+
 keep_md: true 
+
+toc: yes 
+
+pdf_document: default 
+
+self_contained: no 
+
 
 ---
 
@@ -87,6 +103,7 @@ median(Totalnumberstepsperday_NAImputed$Steps)
 ##Are there differences in activity patterns between weekdays and weekends?
 ```{r , echo=TRUE}
 
+
 dt_NAImputed$day <- weekdays(dt_NAImputed$date)
 
 for(i in 1:nrow(dt_NAImputed)){
@@ -105,7 +122,13 @@ for(i in 1:nrow(dt_NAImputed)){
 AvgstepsByweekday <- aggregate(dt_NAImputed$steps,by=list(dt_NAImputed$day,dt_NAImputed$interval),mean)
 names(AvgstepsByweekday) <- c("day","interval","mean_steps")
 
-library(lattice)
-    xyplot(mean_steps ~ interval | day, AvgstepsByweekday, type = "l", layout = c(1, 2), 
-           xlab = "Interval", ylab = "Number of steps")
+library(ggplot2)
+    
+ggplot(AvgstepsByweekday, aes(interval, mean_steps)) +  
+     geom_line() +  
+     facet_grid(day ~ .) +      
+    xlab("5-minute interval") +  
+     ylab("avarage number of steps") 
+
+    
 ```
