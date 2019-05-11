@@ -1,25 +1,8 @@
 ---
-title: "Reproducible Research Project 1" 
-
-author: "honey goyal" 
-
-date: "June 16, 2018" 
-
+title: "Reproducible Research Project 1"
 output: 
-
-html_document: 
-
-fig_caption: yes 
-
-keep_md: true 
-
-toc: yes 
-
-pdf_document: default 
-
-self_contained: no 
-
-
+  html_document: 
+    keep_md: yes
 ---
 
 ##Assignment Instructions 
@@ -45,11 +28,9 @@ destFile <- "plot1.png"
 if (!file.exists(zipFile)) {
     download.file(zipUrl,zipFile,mode="wb")
 }
-
 if(!file.exists(sourceFile)){
     unzip(zipFile)
 }
-
 dt <- read.csv(sourceFile,header = TRUE,sep = ",")
 dt$date <- as.Date(dt$date)
 ```
@@ -59,18 +40,14 @@ dt$date <- as.Date(dt$date)
 Totalnumberstepsperday <- aggregate(dt$steps,by=list(dt$date),sum,na.rm=TRUE)
 names(Totalnumberstepsperday) <- c("Date","Steps")
 hist(Totalnumberstepsperday$Steps,col="blue",xlab="Total Steps",main="Total Number of steps per day")
-
 mean(Totalnumberstepsperday$Steps)
-
 median(Totalnumberstepsperday$Steps)
 ```
 ##What is the average daily activity pattern?
 ```{r , echo=TRUE}
-
 Totalnumberstepsperinterval <- aggregate(dt$steps,by=list(dt$interval),mean,na.rm=TRUE)
 names(Totalnumberstepsperinterval) <- c("Interval","Steps")
 plot(Totalnumberstepsperinterval$Interval,Totalnumberstepsperinterval$Steps,col="blue",type = "l",xlab = "Intervals",ylab = "Average Steps",main = "Average Steps per Interval")
-
 #Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
 Totalnumberstepsperinterval[Totalnumberstepsperinterval$Steps==max(Totalnumberstepsperinterval$Steps),1]
 ```
@@ -78,34 +55,25 @@ Totalnumberstepsperinterval[Totalnumberstepsperinterval$Steps==max(Totalnumberst
 ##Imputing missing values
 ```{r , echo=TRUE}
 sum(is.na(dt$steps))
-
 dt_NAImputed <- dt
 dt_NAImputed_na <- which(is.na(dt_NAImputed$steps))
 l <- length(dt_NAImputed_na)
-
 for(i in 1:l){
     
     dt_NAImputed[i,]$steps <- Totalnumberstepsperinterval[Totalnumberstepsperinterval$Interval==dt_NAImputed[i,]$interval,]$Steps
 }
-
 Totalnumberstepsperday_NAImputed <- aggregate(dt_NAImputed$steps,by=list(dt_NAImputed$date),sum,na.rm=TRUE)
 names(Totalnumberstepsperday_NAImputed) <- c("Date","Steps")
-
 # histogram of the total number of steps taken each day 
 hist(Totalnumberstepsperday_NAImputed$Steps,col="blue",xlab="Total Steps",main="Total Number of steps per day")
-
 #mean total number of steps taken per day
 mean(Totalnumberstepsperday_NAImputed$Steps)
 #median total number of steps taken per day
 median(Totalnumberstepsperday_NAImputed$Steps)
-
 ```
 ##Are there differences in activity patterns between weekdays and weekends?
 ```{r , echo=TRUE}
-
-
 dt_NAImputed$day <- weekdays(dt_NAImputed$date)
-
 for(i in 1:nrow(dt_NAImputed)){
     
     
@@ -121,14 +89,9 @@ for(i in 1:nrow(dt_NAImputed)){
     
 AvgstepsByweekday <- aggregate(dt_NAImputed$steps,by=list(dt_NAImputed$day,dt_NAImputed$interval),mean)
 names(AvgstepsByweekday) <- c("day","interval","mean_steps")
-
-library(ggplot2)
     
-ggplot(AvgstepsByweekday, aes(interval, mean_steps)) +  
-     geom_line() +  
-     facet_grid(day ~ .) +      
-    xlab("5-minute interval") +  
-     ylab("avarage number of steps") 
-
+library(lattice)
+    xyplot(mean_steps ~ interval | day, AvgstepsByweekday, type = "l", layout = c(1, 2), 
+           xlab = "Interval", ylab = "Number of steps")
     
 ```
